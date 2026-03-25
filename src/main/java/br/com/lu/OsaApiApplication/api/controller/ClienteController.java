@@ -6,6 +6,8 @@ package br.com.lu.OsaApiApplication.api.controller;
 
 import br.com.lu.OsaApiApplication.domain.model.Cliente;
 import br.com.lu.OsaApiApplication.domain.repository.ClienteRepository;
+import br.com.lu.OsaApiApplication.domain.service.ClienteService;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +34,9 @@ public class ClienteController {
     @Autowired
     private ClienteRepository clienteRepository;
     
+    @Autowired
+    private ClienteService clienteService;
+    
      @GetMapping("/clientes")
     public List<Cliente> listar() {
         
@@ -50,17 +55,17 @@ public class ClienteController {
     }
     @PostMapping("/clientes")
     @ResponseStatus(HttpStatus.CREATED)
-    public Cliente adicionar(@RequestBody Cliente cliente) {
-        return clienteRepository.save(cliente);
+    public Cliente adicionar(@Valid @RequestBody Cliente cliente) {
+        return clienteService.salvar(cliente);
     }
    @PutMapping("/clientes/{clienteID}")
-    public ResponseEntity<Cliente> atualizar (@PathVariable long clienteID,
+    public ResponseEntity<Cliente> atualizar (@Valid @PathVariable long clienteID,
                                               @RequestBody Cliente cliente) {
         if (!clienteRepository.existsById(clienteID)){
             return ResponseEntity.notFound().build();
         }
         cliente.setId(clienteID);
-        cliente = clienteRepository.save(cliente);
+        cliente = clienteService.salvar(cliente);
         return ResponseEntity.ok (cliente);
 }
     @DeleteMapping("clientes/{clienteID}")
@@ -68,7 +73,7 @@ public class ClienteController {
         if (!clienteRepository.existsById(clienteID)){
             return ResponseEntity.notFound().build();
         }
-        clienteRepository.deleteById(clienteID);
+        clienteService.excluir(clienteID);
         return ResponseEntity.noContent().build();
     }
 }
