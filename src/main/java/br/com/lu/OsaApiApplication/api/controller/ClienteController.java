@@ -7,6 +7,10 @@ package br.com.lu.OsaApiApplication.api.controller;
 import br.com.lu.OsaApiApplication.domain.model.Cliente;
 import br.com.lu.OsaApiApplication.domain.repository.ClienteRepository;
 import br.com.lu.OsaApiApplication.domain.service.ClienteService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Optional;
@@ -22,8 +26,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-
-
 /**
  *
  * @author Aluno
@@ -33,49 +35,81 @@ public class ClienteController {
 
     @Autowired
     private ClienteRepository clienteRepository;
-    
+
     @Autowired
     private ClienteService clienteService;
-    
-     @GetMapping("/clientes")
+
+    @GetMapping("/clientes")
+    @Operation(summary = "Get a product by id", description = "Returns a product as per the id")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved"),
+        @ApiResponse(responseCode = "404", description = "Not found - The product was not found")
+    })
+
     public List<Cliente> listar() {
-        
+
         return clienteRepository.findAll();
     }
 
     @GetMapping("/clientes/{clienteID}")
-    public ResponseEntity<Cliente> buscar (@PathVariable long clienteID){
+    @Parameter(name = "id", description = "cliente id", example = "1")
+    @Operation(summary = "Get a cliente by id", description = "Returns a cliente as per the id")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved"),
+        @ApiResponse(responseCode = "404", description = "Not found - The cliente was not found")
+    })
+    
+    public ResponseEntity<Cliente> buscar(@PathVariable long clienteID) {
         Optional<Cliente> cliente = clienteRepository.findById(clienteID);
-        if (cliente.isPresent()){
+        if (cliente.isPresent()) {
             return ResponseEntity.ok(cliente.get());
-        }else{
-        return ResponseEntity.notFound().build();
-        
+        } else {
+            return ResponseEntity.notFound().build();
+
         }
     }
+
     @PostMapping("/clientes")
+    @Parameter(name = "cliente", description = "add cliente ")
+    @Operation(summary = "Adicionar cliente", description = "Returns a cliente as per the id")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved"),
+        @ApiResponse(responseCode = "400", description = "Bad Request")
+    })
     @ResponseStatus(HttpStatus.CREATED)
     public Cliente adicionar(@Valid @RequestBody Cliente cliente) {
         return clienteService.salvar(cliente);
     }
-   @PutMapping("/clientes/{clienteID}")
-    public ResponseEntity<Cliente> atualizar (@Valid @PathVariable long clienteID,
-                                              @RequestBody Cliente cliente) {
-        if (!clienteRepository.existsById(clienteID)){
+
+    @PutMapping("/clientes/{clienteID}")
+    @Parameter(name = "client id", description = "atualizar cliente", example = "1")
+    @Operation(summary = "Atualizar cliente", description = "Returns a cliente as per the id")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved"),
+        @ApiResponse(responseCode = "404", description = "Not found - The cliente was not found")
+    })
+    public ResponseEntity<Cliente> atualizar(@Valid @PathVariable long clienteID,
+            @RequestBody Cliente cliente) {
+        if (!clienteRepository.existsById(clienteID)) {
             return ResponseEntity.notFound().build();
         }
         cliente.setId(clienteID);
         cliente = clienteService.salvar(cliente);
-        return ResponseEntity.ok (cliente);
-}
+        return ResponseEntity.ok(cliente);
+    }
+
     @DeleteMapping("clientes/{clienteID}")
-    public ResponseEntity<Void> excluir(@PathVariable Long clienteID){
-        if (!clienteRepository.existsById(clienteID)){
+    @Parameter(name = " excluir id", description = "excluir cliente", example = "1")
+    @Operation(summary = "Excluir cliente", description = "Returns a cliente as per the id")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved"),
+        @ApiResponse(responseCode = "404", description = "Not found - The cliente was not found")
+    }) 
+    public ResponseEntity<Void> excluir(@PathVariable Long clienteID) {
+        if (!clienteRepository.existsById(clienteID)) {
             return ResponseEntity.notFound().build();
         }
         clienteService.excluir(clienteID);
         return ResponseEntity.noContent().build();
     }
 }
-    
- 

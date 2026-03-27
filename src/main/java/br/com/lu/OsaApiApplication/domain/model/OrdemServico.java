@@ -5,6 +5,7 @@
 package br.com.lu.OsaApiApplication.domain.model;
 
 import br.com.lu.OsaApiApplication.StatusOrdemServico;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -26,13 +27,21 @@ public class OrdemServico {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(name = "Product ID", example = "1", required = true)
     private Long id;
 
     @ManyToOne
     private Cliente cliente;
-
+    
+ 
+    private String name;
+    @Schema(name = "Product name", example = "Product 1", required = false)
     private String descricao;
-    private BigDecimal preco;
+    
+    @Schema(name = "Product price", example = "$100.00", required = true)
+    private String price;
+
+   private BigDecimal preco;
 
     @Enumerated(EnumType.STRING)
     private StatusOrdemServico status;
